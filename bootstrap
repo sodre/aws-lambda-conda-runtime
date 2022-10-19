@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Go to TASK_ROOT
+cd $LAMBDA_TASK_ROOT
+
+export MAMBA_EXE="/opt/bin/micromamba";
+export MAMBA_ROOT_PREFIX=/tmp/lambda
+
+eval "$(micromamba shell hook --shell=bash --prefix $MAMBA_ROOT_PREFIX)"
+micromamba create -n base
+
+# Install environment
+# micromamba install -y -n base -f environment.yml
+# micromamba clean --all --yes
+
+# Download and Unpack the environment
+# I tried using Go UnpackIt, but it failed to unpack the environment correctly
+micromamba create -n unpack
+micromamba install -y -n unpack -c conda-forge tar bzip2
+micromamba clean --all --yes
+micromamba activate unpack
+unpack-environment | tar -C /tmp -jx
+
+# Wait for events
+micromamba activate base
+exec python -m awslambdaric $_HANDLER

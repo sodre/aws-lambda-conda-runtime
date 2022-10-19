@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+export PATH=$PATH:/opt/bin
+export MAMBA_EXE="/opt/bin/micromamba"
+export MAMBA_ROOT_PREFIX=/tmp/lambda
+
+eval "$(micromamba shell hook --shell=bash --prefix $MAMBA_ROOT_PREFIX)"
+micromamba create -n base
+micromamba activate base
+
+micromamba install -y -n base --always-softlink --no-pyc -f /tmp/environment.yml
+micromamba clean --all --yes
+
+mkdir -p /output
+rm -f /output/layer.tar.bz2
+tar -C /tmp -jcvf /output/layer.tar.bz2 lambda

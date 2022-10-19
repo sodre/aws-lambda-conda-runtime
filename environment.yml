@@ -1,0 +1,5 @@
+name: lambda
+channels:
+  - conda-forge
+dependencies:
+  - awslambdaric
